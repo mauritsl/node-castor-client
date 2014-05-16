@@ -3,6 +3,7 @@
   "description": "Clustered storage and caching solution using Cassandra",
   "version": "0.0.1",
   "homepage": "https://github.com/mauritsl/node-castor-client",
+  "author": "Maurits Lawende <maurits@voodooli.com> (https://github.com/mauritsl)",
   "license": {
     "type": "MIT",
     "url": "https://raw.githubusercontent.com/mauritsl/node-castor-client/master/LICENSE"
