@@ -1,0 +1,20 @@
+{
+  "name": "castor-client",
+  "description": "Clustered storage and caching solution using Cassandra",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mauritsl/node-castor-client",
+  "license": {
+    "type": "MIT",
+    "url": "https://raw.githubusercontent.com/mauritsl/node-castor-client/master/LICENSE"
+  },
+  "main": "castor-client.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mauritsl/node-castor-client.git"
+  },
+  "dependencies": {
+    "q": ">= 0.9.7",
+    "generic-pool": ">= 2.0.3",
+    "bignum": ">= 0.6.2"
+  }
+}
