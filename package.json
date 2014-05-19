@@ -1,7 +1,7 @@
 {
   "name": "castor-client",
   "description": "Clustered storage and caching solution using Cassandra",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/mauritsl/node-castor-client",
   "author": "Maurits Lawende <maurits@voodooli.com> (https://github.com/mauritsl)",
   "license": {
@@ -23,6 +23,6 @@
     "mocha": ">= 0.0.0"
   },
   "scripts": {
-    "test": "cqlsh < test/database.cql; mocha -b -t 1s; echo \"drop keyspace castortest;\" | cqlsh"
+    "test": "cqlsh < test/database.cql; mocha -b -t 5s; echo \"drop keyspace castortest;\" | cqlsh"
   }
 }
