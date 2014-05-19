@@ -105,6 +105,20 @@ db.set('user_logins')
   .execute();
 ```
 
+## Generate UUID
+
+In Cassandra, it's common to use UUID's for identifying rows. Castor provides a
+simple way to generate a UUID matching the UUID version 4 standard. To generate
+a UUID, use the ``uuid`` function.
+
+```javascript
+var user_id = db.uuid();
+db.set('user')
+  .field('user_id', user_id)
+  .field('username', 'John')
+  .execute();
+```
+
 ## Deleting data
 
 Deleting data can be done using the ``del`` method.
