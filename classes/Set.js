@@ -32,7 +32,10 @@
   };
   
   Set.prototype.field = function(name, value) {
-    this._update.push({field: name, value: value});
+    if (typeof value !== 'undefined') {
+      // Ignore undefined values, to allow easier implementation of REST PATCH calls.
+      this._update.push({field: name, value: value});
+    }
     return this;
   };
   
