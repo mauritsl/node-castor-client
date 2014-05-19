@@ -24,6 +24,7 @@
   var Get = function(transport, schema, keyspace, table) {
     this._transport = transport;
     this._schema = schema.get(table);
+    this._schemaFull = schema;
     this._keyspace = keyspace;
     this._table = table;
     this._fields = [];
@@ -33,6 +34,7 @@
     this._limit = null;
     this._allowFiltering = false;
     this._consistency = 0x0004;
+    this._joins = [];
   };
   
   Get.prototype.fields = function(fields) {
@@ -77,6 +79,21 @@
     return this;
   };
   
+  Get.prototype.join = function(leftField, rightField, fields) {
+    // Right field is in format "table" or "table.field". The fieldname is
+    // identical to the left field if not specified.
+    var parts = rightField.split('.');
+    var rightTable = parts[0];
+    rightField = parts.length > 1 ? parts[1] : leftField;
+    this._joins.push({
+      leftField: leftField,
+      rightTable: rightTable,
+      rightField: rightField,
+      fields: fields
+    });
+    return this;
+  };
+  
   Get.prototype.execute = function() {
     var defer = Q.defer();
     var self = this;
@@ -110,7 +127,12 @@
       if (self._allowFiltering) {
         cql = cql + ' ALLOW FILTERING';
       }
-      new Query(self._transport, cql, self._consistency).execute(defer);
+      if (self._joins.length) {
+        self._executeWithJoins(cql, defer);
+      }
+      else {
+        new Query(self._transport, cql, self._consistency).execute(defer);
+      }
     }).fail(function(error) {
       defer.reject(error);
     });
@@ -120,6 +142,71 @@
   
   Get.prototype.then = function(callback) {
     return this.execute().then(callback);
+  };
+  
+  Get.prototype._executeWithJoins = function(cql, defer) {
+    var self = this;
+    new Query(self._transport, cql, self._consistency).then(function(rows) {
+      var joins = [];
+      self._joins.forEach(function(join) {
+        joins.push(self._executeJoin(rows, join));
+      });
+      Q.all(joins).then(function(results) {
+        results.forEach(function(result) {
+          Object.keys(result.columns).forEach(function(column) {
+            rows.addColumn(result.columns[column], result.values[column]);
+          });
+        });
+        defer.resolve(rows);
+      }).fail(function(error) {
+        defer.reject(error);
+      }).done();
+    });
+  };
+  
+  Get.prototype._executeJoin = function(rows, join) {
+    var self = this;
+    var defer = Q.defer();
+    var columns = {};
+    var values = {};
+    var next = function() {
+      if (!rows.valid()) {
+        defer.resolve({columns: columns, values: values});
+        return;
+      }
+      var row = rows.current();
+      if (typeof row[join.leftField] !== 'undefined') {
+        new Get(self._transport, self._schemaFull, self._keyspace, join.rightTable)
+          .fields(join.fields)
+          .filter(join.rightField, row[join.leftField])
+          .limit(1)
+        .then(function(joinedRows) {
+          joinedRows.getColumns().forEach(function(column) {
+            var name = column.getName();
+            if (typeof columns[name] === 'undefined') {
+              columns[name] = column;
+              values[name] = [];
+            }
+          });
+          if (joinedRows.valid()) {
+            var joinedRow = joinedRows.current();
+            Object.keys(joinedRow).forEach(function(key) {
+              values[key].push(joinedRow[key]);
+            });
+          }
+          else {
+            // No valid row found.
+            join.fields.forEach(function(field) {
+              values[field].push(null);
+            });
+          }
+          rows.next();
+          next();
+        }).fail(defer.reject).done();
+      }
+    };
+    next();
+    return defer.promise;
   };
   
   module.exports = Get;

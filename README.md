@@ -153,6 +153,33 @@ The following options are available:
 - ``CONSISTENCY_EACH_QUORUM``
 - ``CONSISTENCY_LOCAL_ONE``
 
+## Joins
+
+The ``join`` function allows you to easily include values derived from another
+table through a foreign key. Be aware that Cassandra does not support joins.
+This function does actually do another query for each row. This function should
+be used with great care, as it might have detrimental effects on performance
+when used on large resultsets.
+
+```javascript
+db.get('user')
+  .fields(['user_id', 'username'])
+  .join('user_id', 'post.user_id', ['title'])
+.then(function(rows) {
+  while (rows.valid()) {
+    var row = rows.current();
+    console.log(row.username + ' has post ' + row.title);
+    rows.next();
+  }
+});    
+```
+
+Joins do not multiply the number of rows like SQL does. For each row and field,
+the join can provide at most one value. When no matching row in the right table
+can be found, a null is provided. So if a user in the example above has multiple
+posts in the table ``post``, the column ``title`` will only contain the first
+post title returned from the database.
+
 ## Promises
 
 Query results can be retreived as promises using the ``execute`` function.

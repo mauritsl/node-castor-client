@@ -14,6 +14,7 @@
     this.columnCount = 0;
     this._current = 0;
     this.rows = [];
+    this._encoded = [];
     var flags = data.readInt();
     this.columnCount = data.readInt();
     if (flags & 0x0001) {
@@ -27,6 +28,7 @@
     }
     for (var i = 0; i < this.columnCount; ++i) {
       this.columns.push(new ColumnSpec(data, keyspace, tablename));
+      this._encoded.push(true);
     }
     this.rowCount = data.readInt();
     for (var i = 0; i < this.rowCount; ++i) {
@@ -62,8 +64,13 @@
       var value;
       var name = this.columns[i].getName();
       try {
-        var data = new DataStream(this.rows[this._current][i]);
-        object[name] = data.readByType(this.columns[i].getType());
+        if (this._encoded[i]) {
+          var data = new DataStream(this.rows[this._current][i]);
+          object[name] = data.readByType(this.columns[i].getType());
+        }
+        else {
+          object[name] = this.rows[this._current][i];
+        }
       }
       catch (error) {
         object[name] = null;
@@ -107,6 +114,15 @@
       ++this._current;
     }
     return items;
+  };
+  
+  Rows.prototype.addColumn = function(columnSpec, values) {
+    this.columns.push(columnSpec);
+    this._encoded.push(false);
+    for (var i = 0; i < values.length; ++i) {
+      this.rows[i].push(values[i]);
+    }
+    ++this.columnCount;
   };
   
   module.exports = Rows;
