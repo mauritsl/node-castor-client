@@ -171,6 +171,7 @@
     var values = {};
     var next = function() {
       if (!rows.valid()) {
+        rows.rewind();
         defer.resolve({columns: columns, values: values});
         return;
       }
