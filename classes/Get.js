@@ -147,20 +147,23 @@
   Get.prototype._executeWithJoins = function(cql, defer) {
     var self = this;
     new Query(self._transport, cql, self._consistency).then(function(rows) {
-      var joins = [];
-      self._joins.forEach(function(join) {
-        joins.push(self._executeJoin(rows, join));
-      });
-      Q.all(joins).then(function(results) {
-        results.forEach(function(result) {
+      // Execute joins in serial. Row iterating / rewinding will not work
+      // as expected when executed in parallel.
+      var i = -1, next = function() {
+        if (typeof self._joins[++i] === 'undefined') {
+          defer.resolve(rows);
+          return;
+        }
+        self._executeJoin(rows, self._joins[i]).then(function(result) {
           Object.keys(result.columns).forEach(function(column) {
             rows.addColumn(result.columns[column], result.values[column]);
           });
-        });
-        defer.resolve(rows);
-      }).fail(function(error) {
-        defer.reject(error);
-      }).done();
+          next();
+        }).fail(function(error) {
+          defer.reject(error);
+        }).done();
+      };
+      next();
     });
   };
   
