@@ -19,6 +19,10 @@
     this.type = new TypeSpec(data);
   };
   
+  ColumnSpec.prototype.prefix = function(prefix) {
+    this.name = prefix + this.name;
+  };
+  
   ColumnSpec.prototype.getKeyspace = function() {
     return this.keyspace;
   };

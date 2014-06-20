@@ -194,6 +194,25 @@ can be found, a null is provided. So if a user in the example above has multiple
 posts in the table ``post``, the column ``title`` will only contain the first
 post title returned from the database.
 
+The join function accepts an optional fourth argument which is used as fieldname
+prefix. This is useful when using multiple joins.
+
+```javascript
+db.get('user')
+  .fields(['user_id', 'username'])
+  .join('user_id', 'post.user_id', ['title', 'image_id'], 'post_')
+  .join('post_image_id', 'image.image_id', ['data'])
+.then(function(rows) {
+  while (rows.valid()) {
+    var row = rows.current();
+    console.log(row.username + ' has post ' + row.title);
+    rows.next();
+  }
+});    
+```
+
+Joins are allowed to use fields from the preceding joins.
+
 ## Promises
 
 Query results can be retreived as promises using the ``execute`` function.

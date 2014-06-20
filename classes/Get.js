@@ -79,7 +79,10 @@
     return this;
   };
   
-  Get.prototype.join = function(leftField, rightField, fields) {
+  Get.prototype.join = function(leftField, rightField, fields, prefix) {
+    if (typeof prefix === 'undefined') {
+      prefix = '';
+    }
     // Right field is in format "table" or "table.field". The fieldname is
     // identical to the left field if not specified.
     var parts = rightField.split('.');
@@ -89,7 +92,8 @@
       leftField: leftField,
       rightTable: rightTable,
       rightField: rightField,
-      fields: fields
+      fields: fields,
+      prefix: prefix
     });
     return this;
   };
@@ -148,7 +152,8 @@
     var self = this;
     new Query(self._transport, cql, self._consistency).then(function(rows) {
       // Execute joins in serial. Row iterating / rewinding will not work
-      // as expected when executed in parallel.
+      // as expected when executed in parallel and joins can depend on
+      // preceding joins.
       var i = -1, next = function() {
         if (typeof self._joins[++i] === 'undefined') {
           defer.resolve(rows);
@@ -156,6 +161,7 @@
         }
         self._executeJoin(rows, self._joins[i]).then(function(result) {
           Object.keys(result.columns).forEach(function(column) {
+            result.columns[column].prefix(self._joins[i].prefix);
             rows.addColumn(result.columns[column], result.values[column]);
           });
           next();
