@@ -185,10 +185,30 @@
         return;
       }
       var row = rows.current();
-      if (typeof row[join.leftField] !== 'undefined') {
+      var leftFieldValue = row[join.leftField];
+      if (typeof leftFieldValue === 'undefined') {
+        leftFieldValue = null;
+      }
+      if (leftFieldValue === null) {
+        // We cannot join if the value is null, but we have to fill up the empty columns.
+        // The column specification must be derived from the schema, since we cannot
+        // take this from the query results.
+        self._schemaFull.get(join.rightTable).then(function(tableSchema) {
+          join.fields.forEach(function(name) {
+            if (typeof columns[name] === 'undefined') {
+              columns[name] = tableSchema.columns[field];
+              values[name] = [];
+            }
+            values[name].push(null);
+          });
+          rows.next();
+          next();
+        });
+      }
+      else {
         new Get(self._transport, self._schemaFull, self._keyspace, join.rightTable)
           .fields(join.fields)
-          .filter(join.rightField, row[join.leftField])
+          .filter(join.rightField, leftFieldValue)
           .limit(1)
         .then(function(joinedRows) {
           joinedRows.getColumns().forEach(function(column) {
