@@ -160,33 +160,36 @@
     // We need at least 8 bytes for the frame header.
     while (this._inputBuffer.length >= 8) {
       var length = 8 + this._inputBuffer.readUInt32BE(4);
-      // Check if the whole frame is in the buffer.
-      if (this._inputBuffer.length >= length) {
-        var frame = new Buffer(length);
-        this._inputBuffer.copy(frame, 0, 0, length);
-        
-        // Shift off first frame and leave remaining data in input buffer.
-        var remaining = new Buffer(this._inputBuffer.length - length);
-        this._inputBuffer.copy(remaining, 0, length);
-        this._inputBuffer = remaining;
-        var stream = frame.readInt8(2);
-        var opcode = frame.readUInt8(3);
-        var body = new Buffer(length - 8);
-        frame.copy(body, 0, 8);
-        var frame = undefined; // Free mem.
-        if (this._promises[stream] !== undefined) {
-          if (opcode == Transport.ERROR) {
-            this._promises[stream].reject(new TransportError(body));
-          }
-          else {
-            this._promises[stream].resolve(body);
-          }
-          this._releaseStream(stream);
+      if (this._inputBuffer.length < length) {
+        // This frame is incomplete. This function will be called again when
+        // the remainding data comes in.
+        return;
+      }
+      
+      var frame = new Buffer(length);
+      this._inputBuffer.copy(frame, 0, 0, length);
+      
+      // Shift off first frame and leave remaining data in input buffer.
+      var remaining = new Buffer(this._inputBuffer.length - length);
+      this._inputBuffer.copy(remaining, 0, length);
+      this._inputBuffer = remaining;
+      var stream = frame.readInt8(2);
+      var opcode = frame.readUInt8(3);
+      var body = new Buffer(length - 8);
+      frame.copy(body, 0, 8);
+      var frame = undefined; // Free mem.
+      if (this._promises[stream] !== undefined) {
+        if (opcode == Transport.ERROR) {
+          this._promises[stream].reject(new TransportError(body));
         }
         else {
-          // @todo: Handle messages initiated by server
-          console.log('unknown stream: ' + stream);
+          this._promises[stream].resolve(body);
         }
+        this._releaseStream(stream);
+      }
+      else {
+        // @todo: Handle messages initiated by server
+        console.log('unknown stream: ' + stream);
       }
     }
   };
