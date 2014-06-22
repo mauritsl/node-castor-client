@@ -24,7 +24,7 @@ Install using ``npm install castor-client``
 ## Connecting
 
 ```javascript
-var Castor = require('../castor/castor-client');
+var Castor = require('castor-client');
 var db = new Castor('localhost', 'keyspace');
 ```
 
