@@ -2,6 +2,7 @@
 
 (function() {
   var castor = require('../castor-client');
+  var crypto = require('crypto');
   var Q = require('q');
   var Query = require('./Query');
   var Field = require('./Field');
@@ -237,6 +238,21 @@
     };
     next();
     return defer.promise;
+  };
+  
+  Get.prototype.signature = function() {
+    var data = [
+      this._fields,
+      this._filter,
+      this._joins,
+      this._keyspace,
+      this._limit,
+      this._orderBy,
+      this._orderByDirection,
+      this._table
+    ];
+    data = JSON.stringify(data);
+    return crypto.createHash('sha1').update(data).digest('hex');
   };
   
   module.exports = Get;
