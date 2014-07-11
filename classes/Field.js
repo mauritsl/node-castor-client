@@ -60,7 +60,7 @@
       throw Error('Invalid value type for field ' + this.name);
     }
     this.value = this.value.toString();
-    return '\'' + this.value.split('\\').join('\\\\').split('\'').join('\\\'') + '\'';
+    return '\'' + this.value.split("'").join("''") + '\'';
   };
   
   Field.prototype.getInt = function() {
