@@ -36,10 +36,11 @@
     }
     var self = this;
     
-    var body = new Buffer(6 + this._cql.length);
-    body.writeUInt32BE(this._cql.length, 0);
+    var length = Buffer.byteLength(this._cql, 'utf8');
+    var body = new Buffer(6 + length);
+    body.writeUInt32BE(length, 0);
     new Buffer(this._cql).copy(body, 4);
-    body.writeUInt16BE(this._consistency, 4 + this._cql.length);
+    body.writeUInt16BE(this._consistency, 4 + length);
     
     Q.when(this._transport, function(transport) {
       transport.sendFrame(Transport.QUERY, body).then(function(data) {
