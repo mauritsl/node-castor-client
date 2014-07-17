@@ -18,6 +18,10 @@
   };
   
   Field.prototype.getValueString = function() {
+    if (this.value === null) {
+      // All field types can be null.
+      return 'NULL';
+    }
     switch (this._type.type) {
       case TypeSpec.CUSTOM:
         throw Error('Custom column type not supported');
