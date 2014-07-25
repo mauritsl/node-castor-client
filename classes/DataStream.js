@@ -2,6 +2,7 @@
 
 (function() {
   var Bignum = require('bignum');
+  var moment = require('moment');
   var TypeSpec = require('./TypeSpec');
   
   /**
@@ -68,7 +69,7 @@
   };
   
   DataStream.prototype.readTimestamp = function() {
-    return Math.round(this.readInt() * 4294967.296 + (this.readInt() / 1000));
+    return moment.unix(this.readInt() * 4294967.296 + (this.readInt() / 1000)).format();
   };
   
   DataStream.prototype.readList = function(valueType) {

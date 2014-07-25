@@ -104,7 +104,21 @@
   };
   
   Field.prototype.getTimestamp = function() {
-    return '';
+    if (typeof this.value === 'string') {
+      var isDate = this.value.match(/^[0-9]{4}\-[012][0-9]\-[0-3][0-9]$/);
+      var isDateTime = this.value.match(/^[0-9]{4}\-[012][0-9]\-[0-3][0-9]T[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9](\.[0-9]+)?(Z|[\+\-][012][0-9]\:[0-5][0-9])?$/);
+      if (!isDate && !isDateTime) {
+        throw Error('Invalid value for field ' + this.name);
+      }
+      if (this.value.substring(0, 10) === '0000-00-00') {
+        return 'NULL';
+      }
+      return "'" + this.value + "'";
+    }
+    else if (this.value instanceof Date) {
+      return "'" + this.value.toISOString().substring(0, 19) + "'";
+    }
+    throw Error('Unrecognized value type for field ' + this.name);
   };
   
   Field.prototype.getUUID = function() {
