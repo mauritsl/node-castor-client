@@ -317,6 +317,12 @@ be compared to one of the following constants:
 - ``COLLECTION_MAP``
 - ``COLLECTION_SET``
 
+## Retreiving database schema
+
+The database schema can be retreived with the db.schema() function. You can
+provide a column family name. The whole keyspace will be returned if you omit
+this parameter.
+
 ## Executing raw queries
 
 Instead of using ``get``, ``set`` and ``del``, you may also use ``query`` to

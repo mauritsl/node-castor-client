@@ -95,6 +95,9 @@
   };
   
   Schema.prototype.get = function(columnFamily) {
+    if (typeof columnFamily === 'undefined') {
+      return this._schema;
+    }
     if (typeof this._schema[columnFamily] === 'undefined') {
       throw Error('Unknown columnfamily: ' + columnFamily);
     }
