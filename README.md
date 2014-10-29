@@ -217,13 +217,14 @@ Joins are allowed to use fields from the preceding joins.
 
 Rows are identified by tokens in Cassandra. A token is a hash of the primary key
 value, represented as a 64bit signed (-2<sup>63</sup> to 2<sup>63</sup>-1).
-To include the token in de resultset, use the ``includeToken`` function.
+Use the ``includeToken`` function to include the token in the resultset.
 Tokens can be used to iterate through the whole column family. Iteration can be
-done by using ``WHERE token(field) > 234`` (in CQL). This filter can be added
-with the ``fromToken`` function. Rows are ordered by their token and returned
-in that order. Iterating can be done by combining ``fromToken`` with ``limit``.
-Queries without ``fromToken`` will always start with the first rows in the
-column family, thus with token -2<sup>63</sup>.
+done by using ``WHERE token(field) > 234`` (in CQL). In Castor, this filter can
+be added with the ``fromToken`` function.
+Rows are ordered by their token and returned in that order. Iterating can be
+done by combining ``fromToken`` with ``limit``. Queries without ``fromToken``
+will always start with the first rows in the column family, thus with token
+-2<sup>63</sup>.
 
 The following example will iterate the user table row by row.
 
@@ -254,6 +255,10 @@ Tokens are not unique for rows in tables with multiple fields in the primary
 key. The example above only works when the primary key has one field (which
 is likely "user_id"). Do not use tokens for iterating wide tables (tables with
 multiple columns in the primary key).
+
+The token values are returned as strings and accepted in that format by the
+``fromToken`` function. The application should not make any assumptions about
+the token format.
 
 ## Promises
 
