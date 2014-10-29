@@ -7,6 +7,7 @@
   var Query = require('./Query');
   var Field = require('./Field');
   var Schema = require('./Schema');
+  var bignum = require('bignum');
   
   /**
    * Get class
@@ -36,10 +37,30 @@
     this._allowFiltering = false;
     this._consistency = 0x0004;
     this._joins = [];
+    this._includeToken = false;
+    this._fromToken = null;
   };
   
   Get.prototype.fields = function(fields) {
     this._fields = fields;
+    return this;
+  };
+  
+  Get.prototype.includeToken = function() {
+    this._includeToken = true;
+    return this;
+  };
+  
+  Get.prototype.fromToken = function(token) {
+    var value = token.toString();
+    if (!value.match(/^\-?[0-9]+$/)) {
+      throw Error('Invalid token: ' + token);
+    }
+    var big = bignum(value);
+    if (big.gt(bignum.pow(2, 63).sub(1)) || big.lt(bignum(0).sub(bignum.pow(2, 63)))) {
+      throw Error('Token is out of range');
+    }
+    this._fromToken = token;
     return this;
   };
   
@@ -111,6 +132,9 @@
       else {
         cql = cql + '*';
       }
+      if (self._includeToken) {
+        cql = cql + ', token(' + schema.keys.join(', ') + ') as "token"';
+      }
       cql = cql + ' FROM ' + self._keyspace + '.' + self._table;
       if (self._filter.length) {
         for (var i = 0; i < self._filter.length; ++i) {
@@ -122,6 +146,10 @@
           cql = cql + (i == 0 ? ' WHERE ' : ' AND ');
           cql = cql + filter.toString();
         }
+      }
+      if (self._fromToken !== null) {
+        cql = cql + (self._filter.length ? ' AND ' : ' WHERE ');
+        cql = cql + 'token(' + schema.keys.join(', ') + ') > ' + self._fromToken;
       }
       if (self._orderBy !== null) {
         cql = cql + ' ORDER BY ' + self._orderBy + ' ' + self._orderByDirection.toUpperCase();
