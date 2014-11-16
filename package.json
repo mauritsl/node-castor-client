@@ -14,9 +14,10 @@
     "url": "git://github.com/mauritsl/node-castor-client.git"
   },
   "dependencies": {
-    "q": ">= 0.9.7",
+    "bignum": ">= 0.6.2",
     "generic-pool": ">= 2.0.3",
-    "bignum": ">= 0.6.2"
+    "moment": "^2.8.3",
+    "q": ">= 0.9.7"
   },
   "devDependencies": {
     "chai": ">= 0.0.0",
