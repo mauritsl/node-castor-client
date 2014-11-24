@@ -54,7 +54,7 @@
           readyCallback();
         }
       }).fail(function(error) {
-        // @todo Exceptions are not visible. Destroy connection and emit error.
+        self.destroy();
         throw error;
       });
     }).on('close', function(had_error) {
@@ -63,8 +63,15 @@
       self._inputBuffer = Buffer.concat([self._inputBuffer, new Buffer(data)]);
       self._fetchFrames();
     }).on('error', function(error) {
-     // @todo Exceptions are not visible. Destroy connection and emit error.
-      throw error;
+      if (error.code === 'ECONNRESET') {
+        // Cassandra sometimes resets idle connections. We simple destroy this
+        // transport. This will fail open queries (if any) and automatically
+        // trigger the connection pool to open a new connection.
+        self.destroy();
+      }
+      else {
+        throw error;
+      }
     });
   };
   
