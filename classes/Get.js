@@ -125,6 +125,9 @@
     var self = this;
     
     Q.when(this._schema).then(function(schema) {
+      if (typeof schema === 'undefined') {
+        throw Error('Unknown table ' + self._table);
+      }
       var cql = 'SELECT ';
       if (self._fields.length) {
         cql = cql + self._fields.join(', ');
