@@ -44,7 +44,7 @@
           client.destroy();
         },
         max: 20,
-        min: 10,
+        min: 1,
         idleTimeoutMillis: 30000
       });
     }
