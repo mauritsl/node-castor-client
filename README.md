@@ -370,6 +370,12 @@ The database schema can be retreived with the db.schema() function. You can
 provide a column family name. The whole keyspace will be returned if you omit
 this parameter.
 
+The schema is read after connecting to the database and is then cached in memory.
+If you need to reload it you can use the ``reloadSchema`` function, which will
+return a promise that is resolved without a value when the schema is reloaded.
+All new queries (except raw queries via ``query``) are queued until the new
+schema is loaded.
+
 ## Executing raw queries
 
 Instead of using ``get``, ``set`` and ``del``, you may also use ``query`` to

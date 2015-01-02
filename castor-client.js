@@ -19,8 +19,6 @@
   function Castor(host, keyspace) {
     var self = this;
     
-    this.ready = false;
-    
     // Transport is a promise before we are actually connected.
     // This allows us to queue queries using when().
     var transportDefer = Q.defer();
@@ -57,7 +55,6 @@
         self._transport = client;
         var schema = new Schema(self._transport, keyspace, 0x0004).read().then(function(schema) {
           schemaDefer.resolve(schema);
-          self.ready = true;
         }).fail(function(error) {
           schemaDefer.reject(error);
         });
@@ -107,6 +104,11 @@
       }
     });
     return defer.promise;
+  };
+  
+  Castor.prototype.reloadSchema = function() {
+    this._schema = new Schema(this._transport, this._keyspace, 0x0004).read();
+    return this._schema;
   };
   
   Castor.prototype.uuid = function() {
