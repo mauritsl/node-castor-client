@@ -32,4 +32,16 @@ describe('Join', function() {
       });
     });
   });
+  
+  it.skip('can handle NULL values in left field', function() {
+    return db.get('nullreference')
+      .fields(['user_id'])
+      .join('user_id', 'user.user_id', ['username'])
+    .then(function(rows) {
+      expect(rows.count()).to.equal(1);
+      rows.toArray().forEach(function(row) {
+        expect(row.username).to.equal(null);
+      });
+    });
+  });
 });

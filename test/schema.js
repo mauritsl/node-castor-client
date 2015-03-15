@@ -27,4 +27,22 @@ describe('Schema', function() {
       expect(schema.values.sort()).to.deep.equal(['username', 'password'].sort());
     });
   });
+  
+  it('can be reloaded', function() {
+    return db.schema().then(function(schema) {
+      expect(schema).to.not.have.property('newtable');
+    }).then(function() {
+      return db.query('CREATE TABLE castortest.newTable (id int, PRIMARY KEY (id));');
+    }).then(function() {
+      return db.schema();
+    }).then(function(schema) {
+      expect(schema).to.not.have.property('newtable');
+    }).then(function() {
+      return db.reloadSchema();
+    }).then(function() {
+      return db.schema();
+    }).then(function(schema) {
+      expect(schema).to.have.property('newtable');
+    });
+  });
 });

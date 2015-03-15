@@ -46,6 +46,28 @@ VALUES
 (4E67C89A-7C98-476D-A49A-957851CD3F5B, C38021D3-A058-4B4B-B1B7-E7375DB0F898, 'Second post');
 
 
+CREATE TABLE nullreference (
+  id int,
+  user_id uuid,
+  PRIMARY KEY (id)
+);
+
+INSERT INTO nullreference (id, user_id) VALUES (1, NULL);
+
+
+CREATE TABLE numbers (
+  id int,
+  value int,
+  PRIMARY KEY (id)
+); 
+
+INSERT INTO numbers (id, value) VALUES (1, 8);
+INSERT INTO numbers (id, value) VALUES (2, 5);
+INSERT INTO numbers (id, value) VALUES (3, 3);
+INSERT INTO numbers (id, value) VALUES (4, 1);
+INSERT INTO numbers (id, value) VALUES (5, 9);
+
+
 CREATE TABLE scalartypes (
   id int,
   test_ascii ascii,

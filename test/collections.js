@@ -4,6 +4,7 @@ var chaiAsPromised = require("chai-as-promised");
 chai.config.includeStack = true;
 chai.use(chaiAsPromised);
 var expect = chai.expect;
+chai.should();
 
 // Connect to Cassandra.
 var Castor = require('../castor-client');
@@ -45,5 +46,33 @@ describe('Collections', function() {
       expect(row.test_set.sort()).to.deep.equal(['Alice', 'Bob', 'Chris']);
       expect(row.test_map).to.deep.equal({first: 1, second: 2});
     });
+  });
+  
+  it('cannot accept strings for list', function() {
+    db.set('scalartypes')
+      .field('id', 3)
+      .field('test_list', 'test')
+      .execute().should.be.rejected;
+  });
+  
+  it('cannot accept arrays for maps', function() {
+    db.set('scalartypes')
+      .field('id', 3)
+      .field('test_map', ['first', 'second'])
+      .execute().should.be.rejected;
+  });
+  
+  it('cannot accept strings for maps', function() {
+    db.set('scalartypes')
+      .field('id', 3)
+      .field('test_list', 'test')
+      .execute().should.be.rejected;
+  });
+  
+  it('cannot accept strings for set', function() {
+    db.set('scalartypes')
+      .field('id', 3)
+      .field('test_set', 'test')
+      .execute().should.be.rejected;
   });
 });

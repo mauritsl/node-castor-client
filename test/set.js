@@ -32,4 +32,41 @@ describe('Set', function() {
       .field('id', 99)
       .execute();
   });
+  
+  it('can set fields to null', function() {
+    return db.set('scalartypes')
+      .field('id', 90)
+      .field('test_int', 123)
+      .field('test_varchar', null)
+    .then(function() {
+      return db.get('scalartypes')
+        .fields(['id', 'test_int', 'test_varchar'])
+        .filter('id', 90)
+        .execute();
+    }).then(function(rows) {
+      if (!rows.valid()) {
+        throw Error('Row not found');
+      }
+      expect(rows.current().test_int).to.equal(123);
+      expect(rows.current().test_varchar).to.equal(null);
+    }).then(function() {
+      return db.set('scalartypes')
+        .field('id', 90)
+        // Set varchar back to "test" to prevent the whole row from being removed. 
+        .field('test_varchar', 'test')
+        .field('test_int', null)
+        .execute();
+    }).then(function() {
+      return db.get('scalartypes')
+        .fields(['id', 'test_int', 'test_varchar'])
+        .filter('id', 90)
+        .execute();
+    }).then(function(rows) {
+      if (!rows.valid()) {
+        throw Error('Row not found');
+      }
+      expect(rows.current().test_int).to.equal(null);
+      expect(rows.current().test_varchar).to.equal('test');
+    });
+  });
 });

@@ -4,6 +4,7 @@ var chaiAsPromised = require("chai-as-promised");
 chai.config.includeStack = true;
 chai.use(chaiAsPromised);
 var expect = chai.expect;
+chai.should();
 
 // Connect to Cassandra.
 var Castor = require('../castor-client');
@@ -102,6 +103,17 @@ describe('Get', function() {
     });
   });
   
+  it('cannot provide more rows than the resultset contains', function() {
+    return db.get('user').then(function(rows) {
+      while (rows.valid()) {
+        rows.next();
+      }
+      expect(function() {
+        rows.current();
+      }).to.throw(Error);
+    });
+  });
+  
   it('can provide column arrays', function() {
     return db.get('user').fields(['username']).then(function(rows) {
       var data = rows.getColumn('username');
@@ -114,5 +126,55 @@ describe('Get', function() {
       var count = rows.count();
       expect(rows.toArray().length).to.equal(count);
     });
+  });
+  
+  it('can order the results', function() {
+    // Note that ordering in Cassandra is only supported when used on the
+    // second primary key field while filtering the first.
+    return db.get('post')
+      .filter('user_id', '4E67C89A-7C98-476D-A49A-957851CD3F5B')
+      .orderBy('post_id')
+    .then(function(rows) {
+      expect(rows.getColumn('post_id')).to.deep.equal(rows.getColumn('post_id').sort());
+    });
+  });
+  
+  it('can order the results in descending order', function() {
+    return db.get('post')
+      .filter('user_id', '4E67C89A-7C98-476D-A49A-957851CD3F5B')
+      .orderBy('post_id', 'desc')
+    .then(function(rows) {
+      expect(rows.getColumn('post_id')).to.deep.equal(rows.getColumn('post_id').sort().reverse());
+    });
+  });
+  
+  it('can allow filtering', function() {
+    // Cassandra does not seem to accept filtering, even with ALLOW FILTERING added.
+    // Is this a setting that needs to b e enabled?
+    return db.get('post')
+      .filter('user_id', '4E67C89A-7C98-476D-A49A-957851CD3F5B')
+      .allowFiltering()
+    .then(function(rows) {
+      expect(rows.count()).to.equal(2);
+    });
+  });
+  
+  it('cannot use arbitrary operators', function() {
+    expect(function() {
+      db.get('numbers')
+        .filter('id', 3, '~')
+        .execute();
+    }).to.throw(Error);
+  });
+  
+  it('cannot filter on non-existing fields', function() {
+    db.get('numbers')
+      .filter('test', 3)
+      .execute().should.be.rejected;
+  });
+  
+  it('cannot read non-existing tables', function() {
+    db.get('unknown_table')
+      .execute().should.be.rejected;
   });
 });

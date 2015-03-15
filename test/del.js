@@ -4,6 +4,7 @@ var chaiAsPromised = require("chai-as-promised");
 chai.config.includeStack = true;
 chai.use(chaiAsPromised);
 var expect = chai.expect;
+chai.should();
 
 // Connect to Cassandra.
 var Castor = require('../castor-client');
@@ -63,6 +64,46 @@ describe('Del', function() {
       return db.del('user')
         .filter('user_id', user_id)
         .execute();
+    });
+  });
+  
+  it('cannot use arbitrary operators', function() {
+    expect(function() {
+      db.del('numbers')
+        .filter('id', 3, '~')
+        .execute();
+    }).to.throw(Error);
+  });
+  
+  it('cannot filter on non-existing fields', function() {
+    db.del('numbers')
+      .filter('test', 3)
+      .execute().should.be.rejected;
+  });
+  
+  it('can be used with .then', function() {
+    var user_id = db.uuid();
+    return db.set('user')
+      .field('user_id', user_id)
+      .field('username', 'test')
+    .then(function() {
+      return db.get('user')
+        .filter('user_id', user_id)
+        .execute();
+    }).then(function(rows) {
+      expect(rows.valid()).to.equal(true);
+    }).then(function() {
+      return db.del('user')
+        .filter('user_id', user_id)
+      .then(function() {
+        // Don't call .execute(), but call .then().
+      });
+    }).then(function() {
+      return db.get('user')
+        .filter('user_id', user_id)
+        .execute();
+    }).then(function(rows) {
+      expect(rows.valid()).to.equal(false);
     });
   });
 });
