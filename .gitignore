@@ -1,4 +1,7 @@
 node_modules
-.*
+.buildpath
+.gitignore
+.project
+.settings
+.vagrant
 jre-*.tar.gz
-
