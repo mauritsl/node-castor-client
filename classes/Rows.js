@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var DataStream = require('./DataStream');
@@ -16,21 +17,23 @@ var Rows = function(data) {
   this._encoded = [];
   var flags = data.readInt();
   this.columnCount = data.readInt();
+  var keyspace, tablename;
   if (flags & 0x0001) {
     // Keyspace and tablename are specified globally.
-    var keyspace = data.readString();
-    var tablename = data.readString();
+    keyspace = data.readString();
+    tablename = data.readString();
   }
   else {
-    var keyspace = null;
-    var tablename = null;
+    keyspace = null;
+    tablename = null;
   }
-  for (var i = 0; i < this.columnCount; ++i) {
+  var i;
+  for (i = 0; i < this.columnCount; ++i) {
     this.columns.push(new ColumnSpec(data, keyspace, tablename));
     this._encoded.push(true);
   }
   this.rowCount = data.readInt();
-  for (var i = 0; i < this.rowCount; ++i) {
+  for (i = 0; i < this.rowCount; ++i) {
     var row = [], value;
     for (var j = 0; j < this.columnCount; ++j) {
       try {

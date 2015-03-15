@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 /**
@@ -64,16 +65,17 @@ TypeSpec.prototype.getTypeName = function() {
 };
 
 TypeSpec.prototype.toString = function() {
+  var valueType, keyType;
   switch (this.type) {
     case this.COLLECTION_LIST:
-      var valueType = this.valueType.toString();
+      valueType = this.valueType.toString();
       return 'list<' + valueType + '>';
     case this.COLLECTION_SET:
-      var valueType = this.valueType.toString();
+      valueType = this.valueType.toString();
       return 'set<' + valueType + '>';
     case this.COLLECTION_MAP:
-      var keyType = this.keyType.toString();
-      var valueType = this.valueType.toString();
+      keyType = this.keyType.toString();
+      valueType = this.valueType.toString();
       return 'map<' + keyType + ',' + valueType + '>';
     default:
       return this.getTypeName();

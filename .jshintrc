@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "require": false,
+    "module": false,
+    "console": false,
+    "Buffer": false
+  },
+  "strict": true
+}

@@ -29,9 +29,9 @@
     "mocha-multi": "~0.6.0"
   },
   "scripts": {
-    "test": "(cqlsh < test/assets/create.cql) && (multi='spec=- mocha-lcov-reporter=lcov.txt' mocha -b --require ./test/assets/blanket.js -t 5s -R mocha-multi) && (cqlsh < test/assets/drop.cql)",
+    "test": "(cqlsh < test/assets/create.cql) && ((multi='spec=- mocha-lcov-reporter=lcov.txt' mocha -b --require ./test/assets/blanket.js -t 5s -R mocha-multi) || (cqlsh < test/assets/drop.cql)) && (cqlsh < test/assets/drop.cql) && (npm run syntax)",
     "coverage": "(cqlsh < test/assets/create.cql) && (mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html) && (cqlsh < test/assets/drop.cql)",
-    "syntax": "jshint castor-client.js classes/*.js test/*.js"
+    "syntax": "jshint castor-client.js classes/*.js"
   },
   "config": {
     "blanket": {

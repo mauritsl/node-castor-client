@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var net = require('net');
@@ -26,8 +27,9 @@ var Transport = function(host, readyCallback) {
   this._streamQueue = [];
   
   // Validate hostname and extract port number (IPv4 or IPv6).
-  var parts, port = 9042;
-  if (parts = host.match(/^(?:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)|\[?([0-9a-z\:]+)\]?)(?:\:([0-9]+))?$/)) {
+  var port = 9042;
+  var parts = host.match(/^(?:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)|\[?([0-9a-z\:]+)\]?)(?:\:([0-9]+))?$/);
+  if (parts) {
     host = parts[1] === undefined ? parts[2] : parts[1];
     port = parts[3] === undefined ? port : parseInt(parts[3]);
   }
@@ -176,7 +178,7 @@ Transport.prototype._fetchFrames = function() {
     var opcode = frame.readUInt8(3);
     var body = new Buffer(length - 8);
     frame.copy(body, 0, 8);
-    var frame = undefined; // Free mem.
+    frame = undefined; // Free mem.
     if (this._promises[stream] !== undefined) {
       if (opcode == Transport.ERROR) {
         this._promises[stream].reject(new TransportError(body));

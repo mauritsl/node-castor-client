@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var Q = require('q');
@@ -82,11 +83,12 @@ Set.prototype.execute = function() {
     // fields are given, and we cannot formulate an INSERT query when increments
     // are used. Use INSERT syntax only for the latter case. We prefer the
     // slightly shorter UPDATE syntax when both are possible.
+    var cql;
     if (self._fields.length || self._increments.length) {
-      var cql = self._toUpdateQuery();
+      cql = self._toUpdateQuery();
     }
     else {
-      var cql = self._toInsertQuery();
+      cql = self._toInsertQuery();
     }
     return new Query(self._transport, cql, self._consistency).execute();
   });
@@ -103,10 +105,10 @@ Set.prototype._toInsertQuery = function() {
     names.push(key.name.toString());
     values.push(key.getValueString());
   });
-  var cql = 'INSERT INTO ' + this._keyspace + '.' + this._table
-    + ' (' + names.join(', ') + ')'
-    + ' VALUES'
-    + ' (' + values.join(', ') + ')';
+  var cql = 'INSERT INTO ' + this._keyspace + '.' + this._table +
+    ' (' + names.join(', ') + ')' +
+    ' VALUES' +
+    ' (' + values.join(', ') + ')';
   return cql;
 };
 
@@ -122,9 +124,9 @@ Set.prototype._toUpdateQuery = function() {
   this._increments.forEach(function(increment) {
     fields.push(increment.field + ' = ' + increment.field + ' + ' + increment.amount);
   });
-  var cql = 'UPDATE ' + this._keyspace + '.' + this._table
-    + ' SET ' + fields.join(', ')
-    + ' WHERE ' + keys.join(' AND ');
+  var cql = 'UPDATE ' + this._keyspace + '.' + this._table +
+    ' SET ' + fields.join(', ') +
+    ' WHERE ' + keys.join(' AND ');
   return cql;
 };
 

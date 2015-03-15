@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var castor = require('../castor-client');
@@ -66,7 +67,7 @@ Del.prototype.execute = function() {
           throw Error('Unknown field ' + self._filter[i].name + ' in filter');
         }
         var filter = new Field(self._filter[i].name, type, self._filter[i].value, self._filter[i].operator);
-        cql = cql + (i == 0 ? ' WHERE ' : ' AND ');
+        cql = cql + (i === 0 ? ' WHERE ' : ' AND ');
         cql = cql + filter.toString();
       }
     }

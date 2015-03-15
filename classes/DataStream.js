@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var Bignum = require('bignum');
@@ -113,10 +114,11 @@ DataStream.prototype.readBoolean = function() {
 };
 
 DataStream.prototype.readInet = function() {
+  var i;
   if (this.data.length === 4) {
     // IPv4
     var inet = [];
-    for (var i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; ++i) {
       inet.push(this.readChar());
     }
     return inet.join('.');
@@ -125,12 +127,12 @@ DataStream.prototype.readInet = function() {
     // IPv6
     var parts = [];
     var empty = 0;
-    for (var i = 0; i < 8; ++i) {
+    for (i = 0; i < 8; ++i) {
       var part = new Buffer(2);
-      part.writeUInt16BE(this.readShort(), 0)
+      part.writeUInt16BE(this.readShort(), 0);
       part = part.toString('hex').replace(/^0+(.)$/, '$1');
       if (empty < 2 && part === '0') {
-        if (empty == 0) {
+        if (empty === 0) {
           empty = 1;
           parts.push('');
         }
@@ -203,6 +205,6 @@ DataStream.prototype.readByType = function(type) {
     case TypeSpec.COLLECTION_MAP:
       return this.readMap(type.getKeyType(), type.getValueType());
   }
-}
+};
 
 module.exports = DataStream;

@@ -1,3 +1,4 @@
+/* jshint -W097 */
 "use strict";
 
 var Q = require('q');
@@ -72,16 +73,17 @@ Schema.prototype.translateType = function(validator) {
   baseType = types[baseType];
   var type = new Buffer(2);
   type.writeUInt16BE(baseType, 0);
+  var keyType, valueType;
   if (baseType == TypeSpec.COLLECTION_LIST || baseType == TypeSpec.COLLECTION_SET) {
-    var valueType = validator.split('(')[1].split(')')[0];
-    var type = new Buffer(4);
+    valueType = validator.split('(')[1].split(')')[0];
+    type = new Buffer(4);
     type.writeUInt16BE(baseType, 0);
     type.writeUInt16BE(types[valueType], 2);
   }
   if (baseType == TypeSpec.COLLECTION_MAP) {
-    var keyType = validator.split('(')[1].split(')')[0].split(',')[0];
-    var valueType = validator.split('(')[1].split(')')[0].split(',')[1];
-    var type = new Buffer(6);
+    keyType = validator.split('(')[1].split(')')[0].split(',')[0];
+    valueType = validator.split('(')[1].split(')')[0].split(',')[1];
+    type = new Buffer(6);
     type.writeUInt16BE(baseType, 0);
     type.writeUInt16BE(types[keyType], 2);
     type.writeUInt16BE(types[valueType], 4);

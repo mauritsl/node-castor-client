@@ -19,7 +19,7 @@ describe('Get', function() {
       });
       data.map(function(d) {
         d.password = d.password.toString('hex');
-      })
+      });
       expect(data).to.deep.equal([
         {
           user_id: '4e67c89a-7c98-476d-a49a-957851cd3f5b',
