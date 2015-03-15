@@ -387,3 +387,29 @@ db.query('SELECT * FROM user').then(function(rows) {
   console.log(rows.toArray());
 });
 ```
+
+## Development
+
+A [Vagrant](www.vagrantup.com) provisioning file is included to run Cassandra on
+VirtualBox. This can be used to run the unit test and for development of other
+Cassandra applications. Use the commands below to setup this environment.
+
+```
+git clone https://github.com/mauritsl/node-castor-client.git
+cd node-castor-client
+vagrant up
+vagrant ssh
+```
+
+You are now logged into the virtual machine, where you can run the test with the
+following commands:
+
+```
+sudo su
+cd /data
+npm test
+```
+
+You can access the shell from within the virtual machine by typing ``cqlsh``.
+Other applications can connect to this database on host ``192.168.11.11`` at
+port ``9042`` (default).
