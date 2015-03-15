@@ -35,7 +35,7 @@
   },
   "config": {
     "blanket": {
-      "pattern": "classes",
+      "pattern": ["castor-client.js", "classes"],
       "data-cover-never": [
         "node_modules",
         "test"
