@@ -62,15 +62,15 @@ function Castor(host, keyspace) {
 }
 
 // Define contants.
-Castor.CONSISTENCY_ANY = 0x0000;
-Castor.CONSISTENCY_ONE = 0x0001;
-Castor.CONSISTENCY_TWO = 0x0002;
-Castor.CONSISTENCY_THREE = 0x0003;
-Castor.CONSISTENCY_QUORUM = 0x0004;
-Castor.CONSISTENCY_ALL = 0x0005;
-Castor.CONSISTENCY_LOCAL_QUORUM = 0x0006;
-Castor.CONSISTENCY_EACH_QUORUM = 0x0007;
-Castor.CONSISTENCY_LOCAL_ONE = 0x0010;
+Castor.prototype.CONSISTENCY_ANY = 0x0000;
+Castor.prototype.CONSISTENCY_ONE = 0x0001;
+Castor.prototype.CONSISTENCY_TWO = 0x0002;
+Castor.prototype.CONSISTENCY_THREE = 0x0003;
+Castor.prototype.CONSISTENCY_QUORUM = 0x0004;
+Castor.prototype.CONSISTENCY_ALL = 0x0005;
+Castor.prototype.CONSISTENCY_LOCAL_QUORUM = 0x0006;
+Castor.prototype.CONSISTENCY_EACH_QUORUM = 0x0007;
+Castor.prototype.CONSISTENCY_LOCAL_ONE = 0x0010;
 
 Castor.prototype.query = function(cql) {
   var output = new Query(this._transport, cql);
