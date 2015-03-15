@@ -390,7 +390,7 @@ db.query('SELECT * FROM user').then(function(rows) {
 
 ## Development
 
-A [Vagrant](www.vagrantup.com) provisioning file is included to run Cassandra on
+A [Vagrant](https://www.vagrantup.com) provisioning file is included to run Cassandra on
 VirtualBox. This can be used to run the unit test and for development of other
 Cassandra applications. Use the commands below to setup this environment.
 
