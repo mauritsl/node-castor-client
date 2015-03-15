@@ -9,12 +9,9 @@ var expect = chai.expect;
 var Castor = require('../castor-client');
 var db = new Castor('localhost', 'castortest');
 
-// Helper function to throw errors.
-var throwIt = function(e) { throw e; };
-
 describe('Join', function() {
-  it('can retreive data', function(done) {
-    db.get('user')
+  it('can retreive data', function() {
+    return db.get('user')
       .fields(['user_id', 'username'])
       .join('user_id', 'post.user_id', ['title'])
     .then(function(rows) {
@@ -33,6 +30,6 @@ describe('Join', function() {
           expect(row.title).to.equal(null);
         }
       });
-    }).then(done).fail(throwIt).done();
+    });
   });
 });

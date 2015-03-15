@@ -44,3 +44,79 @@ INSERT INTO post
 (user_id, post_id, title)
 VALUES
 (4E67C89A-7C98-476D-A49A-957851CD3F5B, C38021D3-A058-4B4B-B1B7-E7375DB0F898, 'Second post');
+
+
+CREATE TABLE scalartypes (
+  id int,
+  test_ascii ascii,
+  test_bigint bigint,
+  test_blob blob,
+  test_boolean boolean,
+  test_decimal decimal,
+  test_double double,
+  test_float float,
+  test_inet inet,
+  test_int int,
+  test_text text,
+  test_timestamp timestamp,
+  test_uuid uuid,
+  test_timeuuid timeuuid,
+  test_varchar varchar,
+  test_varint varint,
+  PRIMARY KEY (id)
+);
+
+INSERT INTO scalartypes (
+  id,
+  test_ascii,
+  test_bigint,
+  test_blob,
+  test_boolean,
+  test_decimal,
+  test_double,
+  test_float,
+  test_inet,
+  test_int,
+  test_text,
+  test_timestamp,
+  test_uuid,
+  test_timeuuid,
+  test_varchar,
+  test_varint
+) VALUES (
+  1,
+  'ascii text',
+  1234567890,
+  0x1234567890ABCDEF,
+  true,
+  3.1415,
+  3.1415,
+  3.1415,
+  '192.168.11.11',
+  1234,
+  'Lorem ipsum...',
+  '2015-05-05T20:00:00',
+  802b789c-6a22-4b1b-af59-a96a4653a086,
+  430a80e0-cb0e-11e4-ab3c-ab16d2f74901,
+  'varchar text',
+  123456789012345678901234567890
+);
+
+
+CREATE TABLE counters (
+  id int,
+  counter1 counter,
+  counter2 counter,
+  PRIMARY KEY (id)
+);
+
+
+CREATE TABLE collections (
+  id int,
+  test_list list<varchar>,
+  test_set set<varchar>,
+  test_map map<varchar, int>,
+  PRIMARY KEY (id)
+);
+
+INSERT INTO collections (id, test_list, test_set, test_map) VALUES (1, ['Alice', 'Bob'], {'Alice', 'Bob'}, {'Alice': 10, 'Bob': 20});
