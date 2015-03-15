@@ -24,11 +24,13 @@
     "mocha": "~2.2.1",
     "jshint": "~2.6.3",
     "blanket": "~1.1.6",
-    "chai-as-promised": "~4.3.0"
+    "chai-as-promised": "~4.3.0",
+    "mocha-lcov-reporter": "0.0.2",
+    "mocha-multi": "~0.6.0"
   },
   "scripts": {
-    "test": "cqlsh < test/assets/create.cql; mocha -b -t 5s; cqlsh < test/assets/drop.cql",
-    "coverage": "cqlsh < test/assets/create.cql; mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html; cqlsh < test/assets/drop.cql",
+    "test": "(cqlsh < test/assets/create.cql) && (multi='spec=- mocha-lcov-reporter=lcov.txt' mocha -b --require ./test/assets/blanket.js -t 5s -R mocha-multi) && (cqlsh < test/assets/drop.cql)",
+    "coverage": "(cqlsh < test/assets/create.cql) && (mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html) && (cqlsh < test/assets/drop.cql)",
     "syntax": "jshint castor-client.js classes/*.js test/*.js"
   },
   "config": {

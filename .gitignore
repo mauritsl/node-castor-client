@@ -6,4 +6,4 @@ node_modules
 .vagrant
 jre-*.tar.gz
 coverage.html
-
+lcov.txt

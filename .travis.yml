@@ -4,3 +4,4 @@ node_js:
   - "0.10"
 services:
   - cassandra
+after_script: "npm install coveralls@2.10.0 && cat ./lcov.txt | coveralls"
