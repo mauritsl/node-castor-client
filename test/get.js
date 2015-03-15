@@ -1,13 +1,13 @@
-var chai = require('chai');
-var config = require('./config');
-var Castor = require('../castor-client');
 
-// Chai configuration.
+var chai = require('chai');
+var chaiAsPromised = require("chai-as-promised");
 chai.config.includeStack = true;
+chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 // Connect to Cassandra.
-var db = new Castor(config.host, config.keyspace);
+var Castor = require('../castor-client');
+var db = new Castor('localhost', 'castortest');
 
 // Helper function to throw errors.
 var throwIt = function(e) { throw e; };

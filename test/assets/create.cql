@@ -1,3 +1,4 @@
+
 CREATE KEYSPACE castortest
 WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
@@ -43,4 +44,3 @@ INSERT INTO post
 (user_id, post_id, title)
 VALUES
 (4E67C89A-7C98-476D-A49A-957851CD3F5B, C38021D3-A058-4B4B-B1B7-E7375DB0F898, 'Second post');
-

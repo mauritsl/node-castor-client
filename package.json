@@ -20,10 +20,24 @@
     "q": ">= 0.9.7"
   },
   "devDependencies": {
-    "chai": ">= 0.0.0",
-    "mocha": ">= 0.0.0"
+    "chai": "~2.1.1",
+    "mocha": "~2.2.1",
+    "jshint": "~2.6.3",
+    "blanket": "~1.1.6",
+    "chai-as-promised": "~4.3.0"
   },
   "scripts": {
-    "test": "cqlsh < test/database.cql; mocha -b -t 5s; echo \"drop keyspace castortest;\" | cqlsh"
+    "test": "cqlsh < test/assets/create.cql; mocha -b -t 5s; cqlsh < test/assets/drop.cql",
+    "coverage": "cqlsh < test/assets/create.cql; mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html; cqlsh < test/assets/drop.cql",
+    "syntax": "jshint castor-client.js classes/*.js test/*.js"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "classes",
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ]
+    }
   }
 }
