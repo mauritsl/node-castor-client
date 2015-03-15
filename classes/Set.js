@@ -54,10 +54,8 @@ Set.prototype.consistency = function(consistency) {
 };
 
 Set.prototype.execute = function() {
-  var defer = Q.defer();
   var self = this;
-  
-  Q.when(this._schema).then(function(schema) {
+  return Q.when(this._schema).then(function(schema) {
     self._update.forEach(function(update) {
       if (typeof schema.columns[update.field] === 'undefined') {
         throw Error('Unknown field ' + update.field);
@@ -90,12 +88,8 @@ Set.prototype.execute = function() {
     else {
       var cql = self._toInsertQuery();
     }
-    new Query(self._transport, cql, self._consistency).execute(defer);
-  }).fail(function(error) {
-    defer.reject(error);
+    return new Query(self._transport, cql, self._consistency).execute();
   });
-  
-  return defer.promise;
 };
 
 Set.prototype.then = function(callback) {

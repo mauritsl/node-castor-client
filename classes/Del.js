@@ -49,10 +49,8 @@ Del.prototype.consistency = function(consistency) {
 };
 
 Del.prototype.execute = function() {
-  var defer = Q.defer();
   var self = this;
-  
-  Q.when(this._schema).then(function(schema) {
+  return Q.when(this._schema).then(function(schema) {
     var cql = 'DELETE ';
     if (self._fields.length) {
       cql = cql + self._fields.join(', ') + ' ';
@@ -72,12 +70,8 @@ Del.prototype.execute = function() {
         cql = cql + filter.toString();
       }
     }
-    new Query(self._transport, cql, self._consistency).execute(defer);
-  }).fail(function(error) {
-    defer.reject(error);
+    return new Query(self._transport, cql, self._consistency).execute();
   });
-  
-  return defer.promise;
 };
 
 Del.prototype.then = function(callback) {

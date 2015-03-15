@@ -93,20 +93,13 @@ Transport.EVENT = 0x0C;
  * Send the startup frame.
  */
 Transport.prototype._startup = function() {
-  var defer = Q.defer();
-  
   // Create frame body, which is a string map with CQL version.
   var body = new Buffer('....CQL_VERSION..3.0.0');
   body.writeUInt16BE(1, 0);
   body.writeUInt16BE(11, 2);
   body.writeUInt16BE(5, 15);
-  this.sendFrame(Transport.STARTUP, body).then(function(response) {
-    defer.resolve();
-  }).catch(function(error) {
-    defer.reject(error);
-  });
   
-  return defer.promise;
+  return this.sendFrame(Transport.STARTUP, body);
 };
 
 /**

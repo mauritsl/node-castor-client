@@ -59,9 +59,6 @@ Field.prototype.getValueString = function() {
 };
 
 Field.prototype.getString = function() {
-  if (typeof this.value === 'object' || typeof this.value === 'array') {
-    throw Error('Invalid value type for field ' + this.name);
-  }
   this.value = this.value.toString();
   return '\'' + this.value.split("'").join("''") + '\'';
 };

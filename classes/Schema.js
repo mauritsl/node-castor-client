@@ -16,10 +16,9 @@ var Schema = function(transport, keyspace, consistency) {
 
 Schema.prototype.read = function() {
   var self = this;
-  var defer = Q.defer();
-  this._schema = defer.promise;
   var cql = 'SELECT columnfamily_name, column_name, type, validator FROM system.schema_columns WHERE keyspace_name = \'' + this._keyspace + '\'';
-  new Query(this._transport, cql, this._consistency).then(function(rows) {
+  var query = new Query(this._transport, cql, this._consistency);
+  this._schema = query.then(function(rows) {
     var schema = {};
     while (rows.valid()) {
       var row = rows.current();
@@ -37,11 +36,9 @@ Schema.prototype.read = function() {
       rows.next();
     }
     self._schema = schema;
-    defer.resolve(schema);
-  }).fail(function(error) {
-    defer.reject(error);
+    return schema;
   });
-  return defer.promise;
+  return this._schema;
 };
 
 Schema.prototype.translateType = function(validator) {

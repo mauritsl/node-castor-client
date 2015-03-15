@@ -45,11 +45,6 @@ DataStream.prototype.readString = function() {
   return this.read(length).toString();
 };
 
-DataStream.prototype.readLongString = function() {
-  var length = this.readInt();
-  return this.read(length).toString();
-};
-
 DataStream.prototype.readBytes = function() {
   var length = this.readInt();
   return this.read(length);
@@ -166,9 +161,6 @@ DataStream.prototype.readDecimal = function() {
     new Buffer('.'),
     value.slice(value.length - scale)
   ]).toString();
-  if (value === '') {
-    value = '0';
-  }
   return value.replace('-.', '-0.');
 };
 
@@ -205,7 +197,6 @@ DataStream.prototype.readByType = function(type) {
       return this.readUuid();
     case TypeSpec.INET:
       return this.readInet();
-      break;
     case TypeSpec.COLLECTION_LIST:
     case TypeSpec.COLLECTION_SET:
       return this.readList(type.getValueType());

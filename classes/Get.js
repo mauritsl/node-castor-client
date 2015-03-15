@@ -120,10 +120,8 @@ Get.prototype.join = function(leftField, rightField, fields, prefix) {
 };
 
 Get.prototype.execute = function() {
-  var defer = Q.defer();
   var self = this;
-  
-  Q.when(this._schema).then(function(schema) {
+  return Q.when(this._schema).then(function(schema) {
     if (typeof schema === 'undefined') {
       throw Error('Unknown table ' + self._table);
     }
@@ -163,24 +161,21 @@ Get.prototype.execute = function() {
       cql = cql + ' ALLOW FILTERING';
     }
     if (self._joins.length) {
-      self._executeWithJoins(cql, defer);
+      return self._executeWithJoins(cql);
     }
     else {
-      new Query(self._transport, cql, self._consistency).execute(defer);
+      return new Query(self._transport, cql, self._consistency).execute();
     }
-  }).fail(function(error) {
-    defer.reject(error);
   });
-  
-  return defer.promise;
 };
 
 Get.prototype.then = function(callback) {
   return this.execute().then(callback);
 };
 
-Get.prototype._executeWithJoins = function(cql, defer) {
+Get.prototype._executeWithJoins = function(cql) {
   var self = this;
+  var defer = Q.defer();
   new Query(self._transport, cql, self._consistency).then(function(rows) {
     // Execute joins in serial. Row iterating / rewinding will not work
     // as expected when executed in parallel and joins can depend on
@@ -202,6 +197,7 @@ Get.prototype._executeWithJoins = function(cql, defer) {
     };
     next();
   });
+  return defer.promise;
 };
 
 Get.prototype._executeJoin = function(rows, join) {
@@ -227,7 +223,7 @@ Get.prototype._executeJoin = function(rows, join) {
       self._schemaFull.get(join.rightTable).then(function(tableSchema) {
         join.fields.forEach(function(name) {
           if (typeof columns[name] === 'undefined') {
-            columns[name] = tableSchema.columns[field];
+            columns[name] = tableSchema.columns[name];
             values[name] = [];
           }
           values[name].push(null);

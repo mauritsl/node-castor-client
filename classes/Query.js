@@ -29,11 +29,9 @@ Query.prototype.consistency = function(consistency) {
   return this;
 };
 
-Query.prototype.execute = function(defer) {
-  if (typeof defer === 'undefined') {
-    var defer = Q.defer();
-  }
+Query.prototype.execute = function() {
   var self = this;
+  var defer = Q.defer();
   
   var length = Buffer.byteLength(this._cql, 'utf8');
   var body = new Buffer(6 + length);
@@ -70,11 +68,7 @@ Query.prototype.execute = function(defer) {
           defer.reject('Unknown response from server');
       }
     }).fail(function(error) {
-      if (typeof error.stack !== 'undefined') {
-        console.log(error.stack);
-      }
-      console.log('Query error: ' + error.message + "\n" + self._cql);
-      defer.reject(error);
+      defer.reject('Query error: ' + error.message + "\n" + self._cql);
     });
   });
   
