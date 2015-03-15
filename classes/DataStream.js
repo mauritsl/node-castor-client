@@ -85,9 +85,18 @@ DataStream.prototype.readList = function(valueType) {
 DataStream.prototype.readMap = function(keyType, valueType) {
   var map = {};
   var count = this.readShort();
-  for (i = 0; i < count; ++i) {
-    var key = this.readByType(keyType);
-    map[key] = this.readByType(valueType);
+  for (var i = 0; i < count; ++i) {
+    var length, data, key, value;
+    
+    length = this.readShort();
+    data = new DataStream(this.read(length));
+    key = data.readByType(keyType);
+    
+    length = this.readShort();
+    data = new DataStream(this.read(length));
+    value = data.readByType(valueType);
+    
+    map[key] = value;
   }
   return map;
 };
@@ -99,7 +108,7 @@ DataStream.prototype.readFloat = function() {
 };
 
 DataStream.prototype.readDouble = function() {
-  var output = this.data.readFloatBE(this.position);
+  var output = this.data.readDoubleBE(this.position);
   this.position += 8;
   return output;
 };

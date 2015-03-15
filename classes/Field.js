@@ -134,7 +134,7 @@ Field.prototype.getUUID = function() {
 };
 
 Field.prototype.getInet = function() {
-  return '';
+  return this.getString();
 };
 
 Field.prototype.getList = function() {
@@ -151,7 +151,20 @@ Field.prototype.getList = function() {
 };
 
 Field.prototype.getMap = function() {
-  return '';
+  var self = this;
+  if (typeof this.value !== 'object') {
+    throw Error('Invalid value for field ' + this.name);
+  }
+  var map = [];
+  Object.keys(this.value).forEach(function(keyValue) {
+    var field, key, value;
+    field = new Field(self.name, self._type.keyType, keyValue);
+    key = field.getValueString();
+    field = new Field(self.name, self._type.valueType, self.value[keyValue]);
+    value = field.getValueString();
+    map.push(key + ':' + value);
+  });
+  return '{' + map.join(',') + '}';
 };
 
 Field.prototype.getSet = function() {
