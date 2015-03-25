@@ -379,6 +379,35 @@ return a promise that is resolved without a value when the schema is reloaded.
 All new queries (except raw queries via ``query``) are queued until the new
 schema is loaded.
 
+## Using multiple keyspaces
+
+It is possible to use multiple keyspaces, but you always need to start the
+connection with a specific keyspace. You can get a new client with the ``use``
+function. The new client will use the same connection as the parent client.
+
+```javascript
+var Castor = require('castor-client');
+var db1 = new Castor('localhost', 'keyspace1');
+var db2 = db1.use('keyspace2');
+
+// Execute a query on keyspace1.
+db1.get('user').execute();
+
+// Execute a query on keyspace2.
+db2.get('user').execute();
+```
+
+When switching to a different keyspace, the new client will load its schema.
+This is a performance hit for applications that use multiple keyspaces with
+identical schema's. In this case you can pass ``true`` to the second argument.
+This will bypass the schema loading. The new client will use a reference to its
+parent schema.
+
+```javascript
+var db2 = db1.use('keyspace2', true);
+db2.get('user').execute();
+```
+
 ## Executing raw queries
 
 Instead of using ``get``, ``set`` and ``del``, you may also use ``query`` to

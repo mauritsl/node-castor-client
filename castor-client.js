@@ -16,7 +16,28 @@ var pools = {};
 /**
  * Castor class.
  */
-function Castor(host, keyspace) {
+function Castor(host, keyspace, parent, deriveSchema) {
+  this._keyspace = keyspace;
+  this._host = host;
+  
+  // Check if we should derive the connection from the parent.
+  // @see Castor.use()
+  if (parent instanceof Castor) {
+    this._transport = parent._transport;
+    if (deriveSchema) {
+      this._schema = parent._schema;
+    }
+    else {
+      var schemaDefer = Q.defer();
+      this._loadSchema();
+    }
+  }
+  else {
+    this._load();
+  }
+}
+
+Castor.prototype._load = function() {
   var self = this;
   
   // Transport is a promise before we are actually connected.
@@ -25,13 +46,12 @@ function Castor(host, keyspace) {
   this._transport = transportDefer.promise;
   var schemaDefer = Q.defer();
   this._schema = schemaDefer.promise;
-  this._keyspace = keyspace;
   
-  if (pools[host] === undefined) {
+  if (pools[this._host] === undefined) {
     // Create a new connection pool for the given host.
-    pools[host] = GenericPool.Pool({
+    pools[this._host] = GenericPool.Pool({
       create: function(callback) {
-      var client = new Transport(host, function() {
+      var client = new Transport(self._host, function() {
           callback(null, client);
         });
       },
@@ -46,21 +66,27 @@ function Castor(host, keyspace) {
       idleTimeoutMillis: 30000
     });
   }
-  pools[host].acquire(function(err, client) {
+  pools[this._host].acquire(function(err, client) {
     if (err) {
       throw err;
     }
     else {
       transportDefer.resolve(client);
       self._transport = client;
-      var schema = new Schema(self._transport, keyspace, 0x0004).read().then(function(schema) {
-        schemaDefer.resolve(schema);
-      }).fail(function(error) {
-        schemaDefer.reject(error);
-      });
+      self._loadSchema();
     }
   });
-}
+};
+
+Castor.prototype._loadSchema = function() {
+  var schemaDefer = Q.defer();
+  this._schema = schemaDefer.promise;
+  new Schema(this._transport, this._keyspace, 0x0004).read().then(function(schema) {
+    schemaDefer.resolve(schema);
+  }).fail(function(error) {
+    schemaDefer.reject(error);
+  });
+};
 
 // Define contants.
 Castor.prototype.CONSISTENCY_ANY = 0x0000;
@@ -72,6 +98,15 @@ Castor.prototype.CONSISTENCY_ALL = 0x0005;
 Castor.prototype.CONSISTENCY_LOCAL_QUORUM = 0x0006;
 Castor.prototype.CONSISTENCY_EACH_QUORUM = 0x0007;
 Castor.prototype.CONSISTENCY_LOCAL_ONE = 0x0010;
+
+Castor.prototype.use = function(keyspace, deriveSchema) {
+  if (keyspace === this._keyspace) {
+    // Shortcut if we switch to the current keyspace.
+    return this;
+  }
+  deriveSchema = typeof deriveSchema === 'undefined' ? false : deriveSchema;
+  return new Castor(this._host, keyspace, this, deriveSchema);
+};
 
 Castor.prototype.query = function(cql) {
   var output = new Query(this._transport, cql);

@@ -142,3 +142,23 @@ CREATE TABLE collections (
 );
 
 INSERT INTO collections (id, test_list, test_set, test_map) VALUES (1, ['Alice', 'Bob'], {'Alice', 'Bob'}, {'Alice': 10, 'Bob': 20});
+
+
+CREATE KEYSPACE castortest2
+WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+USE castortest2;
+
+CREATE TABLE user (
+  user_id uuid,
+  username varchar,
+  password blob,
+  PRIMARY KEY (user_id)
+);
+
+CREATE TABLE story (
+  user_id uuid,
+  story_id uuid,
+  title varchar,
+  PRIMARY KEY (user_id, story_id)
+);
