@@ -20,6 +20,9 @@ function Castor(host, keyspace, parent, deriveSchema) {
   this._keyspace = keyspace;
   this._host = host;
   
+  this._schemaDefer = Q.defer();
+  this._schema = this._schemaDefer.promise;
+  
   // Check if we should derive the connection from the parent.
   // @see Castor.use()
   if (parent instanceof Castor) {
@@ -28,7 +31,6 @@ function Castor(host, keyspace, parent, deriveSchema) {
       this._schema = parent._schema;
     }
     else {
-      var schemaDefer = Q.defer();
       this._loadSchema();
     }
   }
@@ -44,8 +46,6 @@ Castor.prototype._load = function() {
   // This allows us to queue queries using when().
   var transportDefer = Q.defer();
   this._transport = transportDefer.promise;
-  var schemaDefer = Q.defer();
-  this._schema = schemaDefer.promise;
   
   if (pools[this._host] === undefined) {
     // Create a new connection pool for the given host.
@@ -79,12 +79,11 @@ Castor.prototype._load = function() {
 };
 
 Castor.prototype._loadSchema = function() {
-  var schemaDefer = Q.defer();
-  this._schema = schemaDefer.promise;
+  var self = this;
   new Schema(this._transport, this._keyspace, 0x0004).read().then(function(schema) {
-    schemaDefer.resolve(schema);
+    self._schemaDefer.resolve(schema);
   }).fail(function(error) {
-    schemaDefer.reject(error);
+    self._schemaDefer.reject(error);
   });
 };
 
