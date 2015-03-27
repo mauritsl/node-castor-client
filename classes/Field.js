@@ -147,7 +147,7 @@ Field.prototype.getList = function() {
 
 Field.prototype.getMap = function() {
   var self = this;
-  if (typeof this.value !== 'object') {
+  if (typeof this.value !== 'object' || this.value instanceof Array) {
     throw Error('Invalid value for field ' + this.name);
   }
   var map = [];

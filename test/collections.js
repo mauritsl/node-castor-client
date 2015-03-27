@@ -49,28 +49,28 @@ describe('Collections', function() {
   });
   
   it('cannot accept strings for list', function() {
-    db.set('scalartypes')
+    db.set('collections')
       .field('id', 3)
       .field('test_list', 'test')
       .execute().should.be.rejected;
   });
   
   it('cannot accept arrays for maps', function() {
-    db.set('scalartypes')
+    db.set('collections')
       .field('id', 3)
       .field('test_map', ['first', 'second'])
       .execute().should.be.rejected;
   });
   
   it('cannot accept strings for maps', function() {
-    db.set('scalartypes')
+    db.set('collections')
       .field('id', 3)
-      .field('test_list', 'test')
+      .field('test_map', 'test')
       .execute().should.be.rejected;
   });
   
   it('cannot accept strings for set', function() {
-    db.set('scalartypes')
+    db.set('collections')
       .field('id', 3)
       .field('test_set', 'test')
       .execute().should.be.rejected;
