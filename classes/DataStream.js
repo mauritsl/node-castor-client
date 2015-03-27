@@ -168,9 +168,6 @@ DataStream.prototype.readDecimal = function() {
 
 DataStream.prototype.readByType = function(type) {
   switch (type.getType()) {
-    case TypeSpec.CUSTOM:
-      // @todo
-      break;
     case TypeSpec.ASCII:
     case TypeSpec.VARCHAR:
     case TypeSpec.TEXT:

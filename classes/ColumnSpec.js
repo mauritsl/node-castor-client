@@ -15,8 +15,14 @@ var ColumnSpec = function(data, keyspace, tablename) {
     this.keyspace = keyspace;
     this.tablename = tablename;
   }
-  this.name = data.readString();
-  this.type = new TypeSpec(data);
+  if (data.data instanceof Buffer) {
+    this.name = data.readString();
+    this.type = new TypeSpec(data);
+  }
+  else {
+    this.name = data.name;
+    this.type = data.type;
+  }
 };
 
 ColumnSpec.prototype.prefix = function(prefix) {

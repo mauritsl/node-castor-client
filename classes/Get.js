@@ -7,6 +7,8 @@ var Q = require('q');
 var Query = require('./Query');
 var Field = require('./Field');
 var Schema = require('./Schema');
+var ColumnSpec = require('./ColumnSpec');
+var TypeSpec = require('./TypeSpec');
 var bignum = require('bignum');
 
 /**
@@ -215,7 +217,8 @@ Get.prototype._executeJoin = function(rows, join) {
     var row = rows.current();
     var leftFieldValue = row[join.leftField];
     if (typeof leftFieldValue === 'undefined') {
-      leftFieldValue = null;
+      defer.reject('Cannot join on unexisting field ' + join.leftField);
+      return;
     }
     if (leftFieldValue === null) {
       // We cannot join if the value is null, but we have to fill up the empty columns.
@@ -224,7 +227,9 @@ Get.prototype._executeJoin = function(rows, join) {
       self._schemaFull.get(join.rightTable).then(function(tableSchema) {
         join.fields.forEach(function(name) {
           if (typeof columns[name] === 'undefined') {
-            columns[name] = tableSchema.columns[name];
+            var type = new TypeSpec(tableSchema.columns[name]);
+            var column = new ColumnSpec({name: name, type: type}, self._keyspace, self._table);
+            columns[name] = column;
             values[name] = [];
           }
           values[name].push(null);

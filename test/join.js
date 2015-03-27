@@ -33,7 +33,7 @@ describe('Join', function() {
     });
   });
   
-  it.skip('can handle NULL values in left field', function() {
+  it('can handle NULL values in left field', function() {
     return db.get('nullreference')
       .fields(['user_id'])
       .join('user_id', 'user.user_id', ['username'])
@@ -43,5 +43,12 @@ describe('Join', function() {
         expect(row.username).to.equal(null);
       });
     });
+  });
+  
+  it('cannot join on unexisting field', function() {
+    return db.get('nullreference')
+      .fields(['user_id'])
+      .join('unexisting_field', 'user.user_id', ['username'])
+      .execute().should.be.rejected;
   });
 });

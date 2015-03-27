@@ -5,28 +5,28 @@
  * TypeSpec class
  */
 var TypeSpec = function(data) {
-  this.type = data.readShort();
-  switch (this.type) {
-    case this.CUSTOM:
-      this.customTypename = data.readString();
-      break;
-    case this.COLLECTION_LIST:
-    case this.COLLECTION_SET:
-      this.valueType = new TypeSpec(data);
-      break;
-    case this.COLLECTION_MAP:
-      this.keyType = new TypeSpec(data);
-      this.valueType = new TypeSpec(data);
-      break;
+  if (data.data instanceof Buffer) {
+    this.type = data.readShort();
+    switch (this.type) {
+      case this.COLLECTION_LIST:
+      case this.COLLECTION_SET:
+        this.valueType = new TypeSpec(data);
+        break;
+      case this.COLLECTION_MAP:
+        this.keyType = new TypeSpec(data);
+        this.valueType = new TypeSpec(data);
+        break;
+    }
+  }
+  else {
+    this.type = data.type;
+    this.keyType = data.keyType;
+    this.valueType = data.valueType;
   }
 };
 
 TypeSpec.prototype.getType = function() {
   return this.type;
-};
-
-TypeSpec.prototype.getCustomTypename = function() {
-  return this.customTypename;
 };
 
 TypeSpec.prototype.getKeyType = function() {

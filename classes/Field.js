@@ -23,8 +23,6 @@ Field.prototype.getValueString = function() {
     return 'NULL';
   }
   switch (this._type.type) {
-    case TypeSpec.CUSTOM:
-      throw Error('Custom column type not supported');
     case TypeSpec.ASCII:
     case TypeSpec.TEXT:
     case TypeSpec.VARCHAR:
@@ -56,7 +54,6 @@ Field.prototype.getValueString = function() {
     case TypeSpec.COLLECTION_SET:
       return this.getSet();
   }
-  throw Error('Unknown type');
 };
 
 Field.prototype.getString = function() {
