@@ -92,14 +92,4 @@ Schema.prototype.translateType = function(validator) {
   return new TypeSpec(type);
 };
 
-Schema.prototype.get = function(columnFamily) {
-  if (typeof columnFamily === 'undefined') {
-    return this._schema;
-  }
-  if (typeof this._schema[columnFamily] === 'undefined') {
-    throw Error('Unknown columnfamily: ' + columnFamily);
-  }
-  return this._schema[columnFamily];
-};
-
 module.exports = Schema;
