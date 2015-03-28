@@ -3,6 +3,7 @@ Castor: NodeJS Cassandra Client
 
 [![Build Status](https://travis-ci.org/mauritsl/node-castor-client.svg?branch=master)](https://travis-ci.org/mauritsl/node-castor-client)
 [![Coverage Status](https://coveralls.io/repos/mauritsl/node-castor-client/badge.svg?branch=master)](https://coveralls.io/r/mauritsl/node-castor-client?branch=master)
+[![Code Climate](https://codeclimate.com/github/mauritsl/node-castor-client/badges/gpa.svg)](https://codeclimate.com/github/mauritsl/node-castor-client)
 
 Cassandra client library for NodeJS, using the native binary protocol.
 
