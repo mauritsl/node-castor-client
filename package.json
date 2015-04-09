@@ -33,6 +33,9 @@
     "coverage": "(cqlsh < test/assets/create.cql) && (mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html) && (cqlsh < test/assets/drop.cql)",
     "syntax": "jshint castor-client.js classes/*.js"
   },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
   "config": {
     "blanket": {
       "pattern": ["castor-client.js", "classes"],
