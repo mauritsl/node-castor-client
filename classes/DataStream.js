@@ -64,7 +64,10 @@ DataStream.prototype.readUuid = function() {
 };
 
 DataStream.prototype.readTimestamp = function() {
-  return moment.unix(this.readInt() * 4294967.296 + (this.readInt() / 1000)).format();
+  var a = this.data.readInt32BE(this.position);
+  var b = this.data.readUInt32BE(this.position + 4);
+  this.position += 8;
+  return moment.unix(a * 4294967.296 + (b / 1000)).format();
 };
 
 DataStream.prototype.readList = function(valueType) {

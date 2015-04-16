@@ -182,6 +182,25 @@ describe('Scalar data types', function() {
     });
   });
   
+  it('can handle dates before epoch', function() {
+    var date = '1860-02-23T12:34:56';
+    return db.set('scalartypes')
+      .field('id', 3)
+      .field('test_timestamp', date)
+    .then(function() {
+      return db.get('scalartypes')
+        .filter('id', 3)
+        .execute();
+    }).then(function(rows) {
+      if (!rows.valid()) {
+        throw Error('Row not found');
+      }
+      return rows.current();
+    }).then(function(row) {
+      expect(String(row.test_timestamp).substring(0, date.length)).to.equal(date);
+    });
+  });
+  
   it('can handle ipv6 addresses', function() {
     return db.set('scalartypes')
       .field('id', 3)
