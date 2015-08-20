@@ -131,7 +131,7 @@ Transport.prototype.sendFrame = function(opcode, body) {
   var self = this;
   var defer = Q.defer();
   this._getStream().then(function(stream) {
-    if (opcode === undefined) {
+    if (typeof opcode === 'undefined') {
       throw new Error('Missing opcode');
     }
     
@@ -179,7 +179,7 @@ Transport.prototype._fetchFrames = function() {
     var body = new Buffer(length - 8);
     frame.copy(body, 0, 8);
     frame = undefined; // Free mem.
-    if (this._promises[stream] !== undefined) {
+    if (typeof this._promises[stream] !== 'undefined') {
       if (opcode == Transport.ERROR) {
         this._promises[stream].reject(new TransportError(body));
       }
@@ -197,20 +197,26 @@ Transport.prototype._fetchFrames = function() {
 
 Transport.prototype._getStream = function() {
   var defer = new Q.defer();
-  if (this._promises[this._streamNumber] === undefined) {
+  if (typeof this._promises[this._streamNumber] === 'undefined') {
+    // The sendFrame-function will set this variable, but not directly.
+    // Set it to null to indicate that this slot is reserved.
+    this._promises[this._streamNumber] = null;
     defer.resolve(this._streamNumber);
   }
   else {
     this._streamQueue.push(defer);
   }
-  this._streamNumber = (this._streamNumber + 1) % 0x80;
+  // Maximum number of concurrent queries. Must be between 0x01 and 0x80.
+  // It seems to run smoother at around 0x20 - 0x40 than 0x80. 
+  var concurrency = 0x20;
+  this._streamNumber = (this._streamNumber + 1) % concurrency;
   return defer.promise;
 };
 
 Transport.prototype._releaseStream = function(stream) {
   this._promises[stream] = undefined;
   var queued = this._streamQueue.shift();
-  if (queued !== undefined) {
+  if (typeof queued !== 'undefined') {
     queued.resolve(stream);
   }
 };
