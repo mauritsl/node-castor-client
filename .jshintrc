@@ -3,7 +3,8 @@
     "require": false,
     "module": false,
     "console": false,
-    "Buffer": false
+    "Buffer": false,
+    "setTimeout": false
   },
   "strict": true
 }
