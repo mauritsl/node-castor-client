@@ -37,10 +37,25 @@ var Transport = function(host, readyCallback) {
     throw new Error("Invalid host or port number");
   }
   
+  this._host = host;
+  this._port = port;
+  this._readyCallback = readyCallback;
+  this._lastConnectAttempt = 0;
+  this.connect();
+};
+
+Transport.prototype.connect = function() {
+  var self = this;
+  
+  if (new Date() - this._lastConnectAttempt < 5000) {
+    return;
+  }
+  this._lastConnectAttempt = new Date();
+  
   // Build options for net.connect().
   var options = {
-    host: host,
-    port: port,
+    host: this._host,
+    port: this._port,
     allowHalfOpen: true
   };
   
@@ -51,15 +66,18 @@ var Transport = function(host, readyCallback) {
     // Send startup frame.
     self._startup().then(function() {
       self.ready = true;
-      if (readyCallback !== undefined) {
-        readyCallback();
+      if (self._readyCallback !== undefined) {
+        self._readyCallback();
       }
     }).fail(function(error) {
       self.destroy();
       throw error;
     });
   }).on('close', function(had_error) {
-    self.ready = false;
+    // Test this case with: tcpkill -i eth0 port 9042
+    setTimeout(function() {
+      self.connect();
+    }, 5000);
   }).on('data', function(data) {
     self._inputBuffer = Buffer.concat([self._inputBuffer, new Buffer(data)]);
     self._fetchFrames();
@@ -71,6 +89,9 @@ var Transport = function(host, readyCallback) {
       self.destroy();
     }
     else {
+      if (self._socket.destroyed) {
+        self.connect();
+      }
       throw error;
     }
   });
@@ -109,6 +130,7 @@ Transport.prototype._startup = function() {
  */
 Transport.prototype.destroy = function() {
   var self = this;
+  var reconnectInterval = this.ready ? 0 : 5000;
   this.ready = false;
   this._socket.end();
   Object.keys(this._promises).forEach(function(stream) {
@@ -119,6 +141,9 @@ Transport.prototype.destroy = function() {
   this._streamQueue.forEach(function(promise) {
     promise.reject('Connection closed');
   });
+  setTimeout(function() {
+    self.connect();
+  }, reconnectInterval);
 };
 
 /**

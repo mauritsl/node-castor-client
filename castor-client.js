@@ -1,7 +1,6 @@
 /* jshint -W097 */
 "use strict";
 
-var GenericPool = require('generic-pool');
 var Q = require('q');
 
 var Transport = require('./classes/Transport');
@@ -48,34 +47,13 @@ Castor.prototype._load = function() {
   this._transport = transportDefer.promise;
   
   if (pools[this._host] === undefined) {
-    // Create a new connection pool for the given host.
-    pools[this._host] = GenericPool.Pool({
-      create: function(callback) {
-      var client = new Transport(self._host, function() {
-          callback(null, client);
-        });
-      },
-      validate: function(client) {
-        return client.connected;
-      },
-      destroy: function(client) {
-        client.destroy();
-      },
-      max: 20,
-      min: 1,
-      idleTimeoutMillis: 30000
+    // Create a new connection for the given host.
+    pools[this._host] = new Transport(self._host, function() {
+      transportDefer.resolve(pools[self._host]);
+      self._transport = pools[self._host];
+      self._loadSchema();
     });
   }
-  pools[this._host].acquire(function(err, client) {
-    if (err) {
-      throw err;
-    }
-    else {
-      transportDefer.resolve(client);
-      self._transport = client;
-      self._loadSchema();
-    }
-  });
 };
 
 Castor.prototype._loadSchema = function() {

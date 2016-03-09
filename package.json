@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "bignum": ">= 0.6.2",
-    "generic-pool": ">= 2.0.3",
     "moment": "^2.8.3",
     "q": ">= 0.9.7"
   },
