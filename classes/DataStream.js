@@ -67,7 +67,7 @@ DataStream.prototype.readTimestamp = function() {
   var a = this.data.readInt32BE(this.position);
   var b = this.data.readUInt32BE(this.position + 4);
   this.position += 8;
-  return moment.unix(a * 4294967.296 + (b / 1000)).format();
+  return moment.unix(a * 4294967.296 + (b / 1000) + 43200).format();
 };
 
 DataStream.prototype.readList = function(valueType) {
