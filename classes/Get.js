@@ -9,13 +9,13 @@ var Field = require('./Field');
 var Schema = require('./Schema');
 var ColumnSpec = require('./ColumnSpec');
 var TypeSpec = require('./TypeSpec');
-var bignum = require('bignum');
+var bignum = require('./Bignum');
 
 /**
  * Get class
- * 
+ *
  * Usage example:
- * 
+ *
  * castor.get('table')
  *   .fields(['field', 'field'])
  *   .filter('field', 'uuid', '...')

@@ -10,7 +10,6 @@ var Castor = require('../castor-client');
 var db = new Castor('localhost', 'castortest');
 
 var Q = require('q');
-var bignum = require('bignum');
 
 describe('Tokens', function() {
   it('can be used for iteration', function() {
@@ -48,7 +47,7 @@ describe('Tokens', function() {
       expect(items.sort()).to.deep.equal(users.sort());
     });
   });
-  
+
   it('rejects invalid tokens', function() {
     expect(function() {
       db.get('user')
@@ -58,7 +57,7 @@ describe('Tokens', function() {
         .limit(1)
         .execute();
     }).to.throw(Error);
-    
+
     expect(function() {
       db.get('user')
         .fields(['user_id'])

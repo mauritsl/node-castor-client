@@ -14,7 +14,7 @@
     "url": "git://github.com/mauritsl/node-castor-client.git"
   },
   "dependencies": {
-    "bignum": ">= 0.6.2",
+    "big-number": "^2.0.0",
     "moment": "^2.12.0",
     "q": ">= 0.9.7"
   },
@@ -28,8 +28,8 @@
     "mocha-multi": "~0.6.0"
   },
   "scripts": {
-    "test": "(cqlsh < test/assets/create.cql) && ((multi='spec=- mocha-lcov-reporter=lcov.txt' mocha -b --require ./test/assets/blanket.js -t 5s -R mocha-multi) || (cqlsh < test/assets/drop.cql)) && (cqlsh < test/assets/drop.cql) && (npm run syntax)",
-    "coverage": "(cqlsh < test/assets/create.cql) && (mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html) && (cqlsh < test/assets/drop.cql)",
+    "test": "(cat test/assets/create.cql | docker exec -i upledgercrm_cassandra_1 cqlsh) && ((mocha -b -t 5s) || (cat test/assets/drop.cql | docker exec -i upledgercrm_cassandra_1 cqlsh)) && (cat test/assets/drop.cql | docker exec -i upledgercrm_cassandra_1 cqlsh) && (npm run syntax)",
+    "coverage": "(cat test/assets/create.cql | docker exec -i upledgercrm_cassandra_1 cqlsh) && (mocha --no-timeouts --require ./test/assets/blanket.js -R html-cov > coverage.html) && (cat test/assets/drop.cql | docker exec -i upledgercrm_cassandra_1 cqlsh)",
     "syntax": "jshint castor-client.js classes/*.js"
   },
   "engines": {
@@ -37,7 +37,10 @@
   },
   "config": {
     "blanket": {
-      "pattern": ["castor-client.js", "classes"],
+      "pattern": [
+        "castor-client.js",
+        "classes"
+      ],
       "data-cover-never": [
         "node_modules",
         "test"

@@ -1,7 +1,7 @@
 /* jshint -W097 */
 "use strict";
 
-var Bignum = require('bignum');
+var Bignum = require('./Bignum');
 var moment = require('moment');
 var TypeSpec = require('./TypeSpec');
 
@@ -86,15 +86,15 @@ DataStream.prototype.readMap = function(keyType, valueType) {
   var count = this.readShort();
   for (var i = 0; i < count; ++i) {
     var length, data, key, value;
-    
+
     length = this.readShort();
     data = new DataStream(this.read(length));
     key = data.readByType(keyType);
-    
+
     length = this.readShort();
     data = new DataStream(this.read(length));
     value = data.readByType(valueType);
-    
+
     map[key] = value;
   }
   return map;
